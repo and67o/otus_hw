@@ -12,7 +12,9 @@ import (
 var ErrInvalidString = errors.New("invalid string")
 
 func Unpack(str string) (string, error) {
-	var resStr strings.Builder
+	if str == "" {
+		return "", nil
+	}
 
 	firstChar, _ := utf8.DecodeRuneInString(str)
 
@@ -20,30 +22,37 @@ func Unpack(str string) (string, error) {
 		return "", ErrInvalidString
 	}
 
-	for i := 0; i < len(str); i++ {
-		value := str[i]
-		if !unicode.IsDigit(rune(value)) {
-			nextIndex := i + 1
-			if nextIndex == len(str) {
-				nextIndex = i
+	var resStr strings.Builder
+	var prevChar string
+
+	for _, v := range str {
+		currentChar := string(v)
+		if unicode.IsDigit(v) {
+			count, err := strconv.Atoi(currentChar)
+			if err != nil {
+				return "", err
 			}
-			if nextIndex < len(str) {
-				nexValue := str[nextIndex]
-				if unicode.IsDigit(rune(nexValue)) {
-					countOfAdd, _ := strconv.Atoi(string(nexValue))
-					strAdd := strings.Repeat(string(value), countOfAdd)
-					resStr.WriteString(strAdd)
-				} else {
-					resStr.WriteString(string(value))
-				}
+
+			if count > 0 {
+				strAdd := strings.Repeat(prevChar, count-1)
+				resStr.WriteString(strAdd)
+			} else {
+				resStrTmp := resStr.String()
+				resStr.Reset()
+				resStrTmp = strings.TrimSuffix(resStrTmp, prevChar)
+				resStr.WriteString(resStrTmp)
 			}
+		} else {
+			resStr.WriteString(currentChar)
 		}
+		prevChar = currentChar
 	}
+
 	return resStr.String(), nil
 }
 
 func haveDoubleNumbers(str string) bool {
-	reg := regexp.MustCompile("\\d{2,}")
+	reg := regexp.MustCompile(`\d{2,}`)
 	doubleNumber := reg.FindString(str)
 
 	return doubleNumber != ""
