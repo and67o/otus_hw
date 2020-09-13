@@ -47,7 +47,6 @@ func TestUnpack(t *testing.T) {
 		},
 	} {
 		result, err := Unpack(tst.input)
-		//fmt.Println(result)
 		require.Equal(t, tst.err, err)
 		require.Equal(t, tst.expected, result)
 	}
