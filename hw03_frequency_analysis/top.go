@@ -22,27 +22,10 @@ func Top10(text string) []string {
 	wordsStruct := handleWordsToStruct(countsWords)
 	sortWords(wordsStruct)
 	if len(wordsStruct) > MaxWords {
-		wordsStruct = wordsStruct[0:MaxWords]
+		wordsStruct = wordsStruct[:MaxWords]
 	}
 
 	return getOnlyWords(wordsStruct)
-}
-
-func getOnlyWords(wordsStruct []countWords) []string {
-	res := make([]string, len(wordsStruct))
-	for _, v := range wordsStruct {
-		res = append(res, v.word)
-		if len(res) == 10 {
-			break
-		}
-	}
-	return res
-}
-
-func sortWords(wordsStruct []countWords) {
-	sort.Slice(wordsStruct, func(i, j int) bool {
-		return wordsStruct[i].count > wordsStruct[j].count
-	})
 }
 
 func handleText(text string) string {
@@ -52,18 +35,35 @@ func handleText(text string) string {
 	return text
 }
 
-func handleWordsToStruct(items map[string]int) []countWords {
-	wordsStruct := make([]countWords, len(items))
-	for i, v := range items {
-		wordsStruct = append(wordsStruct, countWords{i, v})
-	}
-	return wordsStruct
-}
-
 func getCountWords(items []string) map[string]int {
 	countWord := make(map[string]int)
 	for _, v := range items {
 		countWord[v]++
 	}
 	return countWord
+}
+
+func handleWordsToStruct(items map[string]int) []countWords {
+	wordsStruct := make([]countWords, 0, len(items))
+	for count, word := range items {
+		wordsStruct = append(wordsStruct, countWords{count, word})
+	}
+	return wordsStruct
+}
+
+func sortWords(wordsStruct []countWords) {
+	sort.Slice(wordsStruct, func(i, j int) bool {
+		return wordsStruct[i].count > wordsStruct[j].count
+	})
+}
+
+func getOnlyWords(wordsStruct []countWords) []string {
+	res := make([]string, 0, len(wordsStruct))
+	for _, word := range wordsStruct {
+		res = append(res, word.word)
+		if len(res) == 10 {
+			break
+		}
+	}
+	return res
 }

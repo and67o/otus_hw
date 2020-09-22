@@ -1,6 +1,7 @@
 package hw03_frequency_analysis //nolint:golint
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -54,6 +55,7 @@ func TestTop10(t *testing.T) {
 			require.Subset(t, expected, Top10(text))
 		} else {
 			expected := []string{"он", "и", "а", "что", "ты", "не", "если", "-", "то", "Кристофер"}
+			fmt.Println( Top10(text), expected)
 			require.ElementsMatch(t, expected, Top10(text))
 		}
 	})
