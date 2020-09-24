@@ -1,7 +1,6 @@
 package hw03_frequency_analysis //nolint:golint
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -13,6 +12,7 @@ var taskWithAsteriskIsCompleted = true
 type test struct {
 	text    string
 	expected []string
+	method string
 }
 
 func getTestCases() []test {
@@ -20,18 +20,29 @@ func getTestCases() []test {
 		{
 			text:    text,
 			expected: []string{"он", "а", "и", "что", "ты", "не", "если", "то", "его", "кристофер", "робин", "в"},
+			method: "subset",
 		},
-		//{
-		//	text:    text1,
-		//	expected: []string{"ll", "oleg", "e", "p", "o", "sj", "ll!!!!!!", "oleg!", "llloleg", "b"},
-		//},
+		{
+			text:    text1,
+			expected: []string{"oleg", "ll", "oleg!", "l", "oleg.....", "llloleg", "ll!!!!!!"},
+			method: "subset",
+		},
+		{
+			text:    text2,
+			expected: []string{"oleg", "test"},
+			method: "elementsMatch",
+		},
 	}
 }
 
 func TestTop102(t *testing.T) {
 	for _, tst := range getTestCases() {
-		fmt.Println(Top10(tst.text))
-		require.Subset(t, tst.expected, Top10(tst.text))
+		switch tst.method {
+		case  "subset":
+			require.Subset(t, tst.expected, Top10(tst.text))
+		case "elementsMatch":
+			require.ElementsMatch(t, tst.expected, Top10(tst.text))
+		}
 	}
 }
 
