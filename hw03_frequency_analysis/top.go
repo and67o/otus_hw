@@ -7,38 +7,41 @@ import (
 
 const MaxWords = 10
 
+var regEx = `\s+`
+
 type countWords struct {
 	word  string
 	count int
 }
 
 func Top10(text string) []string {
-	text = handleText(text)
 	if text == "" {
 		return nil
 	}
-	textStruct := strings.Split(text, " ")
+
+	textStruct := getStructWords(text)
 	countsWords := getCountWords(textStruct)
 	wordsStruct := handleWordsToStruct(countsWords)
 	sortWords(wordsStruct)
-	if len(wordsStruct) > MaxWords {
-		wordsStruct = wordsStruct[:MaxWords]
-	}
 
 	return getOnlyWords(wordsStruct)
 }
 
-func handleText(text string) string {
-	// text = strings.ToLower(text)
-	space := regexp.MustCompile(`\s+`)
+func getStructWords(text string) []string {
+	text = strings.ToLower(text)
+	space := regexp.MustCompile(regEx)
 	text = space.ReplaceAllString(text, " ")
-	return text
+
+	return strings.Split(text, " ")
 }
 
 func getCountWords(items []string) map[string]int {
 	countWord := make(map[string]int)
-	for _, v := range items {
-		countWord[v]++
+	for _, word := range items {
+		if word == "" || word == "-" {
+			continue
+		}
+		countWord[word]++
 	}
 	return countWord
 }
@@ -61,9 +64,14 @@ func getOnlyWords(wordsStruct []countWords) []string {
 	res := make([]string, 0, len(wordsStruct))
 	for _, word := range wordsStruct {
 		res = append(res, word.word)
-		if len(res) == 10 {
+		if len(res) == MaxWords {
 			break
 		}
 	}
+
+	if len(wordsStruct) > MaxWords {
+		res = res[:MaxWords]
+	}
+
 	return res
 }
