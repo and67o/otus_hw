@@ -55,7 +55,7 @@ func handleWordsToStruct(items map[string]int) []countWords {
 }
 
 func sortWords(wordsStruct []countWords) {
-	sort.Slice(wordsStruct, func(i, j int) bool {
+	sort.SliceStable(wordsStruct, func(i, j int) bool {
 		return wordsStruct[i].count > wordsStruct[j].count
 	})
 }
