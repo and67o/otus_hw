@@ -3,18 +3,30 @@ package hw04_lru_cache //nolint:golint,stylecheck
 type Key string
 
 type Cache interface {
-	// Place your code here
+	Set(key string, value interface{}) bool
+	Get(key string) (interface{}, bool)
+	Clear()
 }
 
 type lruCache struct {
-	// Place your code here:
-	// - capacity
-	// - queue
-	// - items
+	capacity int
+	queue *cacheItem
+	items *cacheItem
+}
+
+func (l lruCache) Set(key string, value interface{}) bool {
+	panic("implement me")
+}
+
+func (l lruCache) Get(key string) (interface{}, bool) {
+	panic("implement me")
+}
+
+func (l lruCache) Clear() {
+	panic("implement me")
 }
 
 type cacheItem struct {
-	// Place your code here
 }
 
 func NewCache(capacity int) Cache {
