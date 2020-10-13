@@ -7,7 +7,7 @@ import (
 )
 
 // Change to true if needed
-var taskWithAsteriskIsCompleted = false
+var taskWithAsteriskIsCompleted = true
 
 var text = `Как видите, он  спускается  по  лестнице  вслед  за  своим
 	другом   Кристофером   Робином,   головой   вниз,  пересчитывая
@@ -42,6 +42,51 @@ var text = `Как видите, он  спускается  по  лестни�
 	иногда,  особенно  когда  папа  дома,  он больше любит тихонько
 	посидеть у огня и послушать какую-нибудь интересную сказку.
 		В этот вечер...`
+
+var text1 =`ll oleg Oleg! ll      lL l oleg 
+oleg..... oleg llLoleg ll 
+  	 oleg ll            	
+
+oleg ll Oleg      ll!!!!!!`
+
+var text2 = ` test oleg      `
+
+type test struct {
+	text    string
+	expected []string
+	method string
+}
+
+func getTestCases() []test {
+	return []test{
+		{
+			text:    text,
+			expected: []string{"он", "а", "и", "что", "ты", "не", "если", "то", "его", "кристофер", "робин", "в"},
+			method: "subset",
+		},
+		{
+			text:    text1,
+			expected: []string{"oleg", "ll", "oleg!", "l", "oleg.....", "llloleg", "ll!!!!!!"},
+			method: "subset",
+		},
+		{
+			text:    text2,
+			expected: []string{"oleg", "test"},
+			method: "elementsMatch",
+		},
+	}
+}
+
+func TestTop102(t *testing.T) {
+	for _, tst := range getTestCases() {
+		switch tst.method {
+		case  "subset":
+			require.Subset(t, tst.expected, Top10(tst.text))
+		case "elementsMatch":
+			require.ElementsMatch(t, tst.expected, Top10(tst.text))
+		}
+	}
+}
 
 func TestTop10(t *testing.T) {
 	t.Run("no words in empty string", func(t *testing.T) {
