@@ -2,6 +2,7 @@ package hw04_lru_cache //nolint:golint,stylecheck
 import (
 	"sync"
 )
+
 type Key string
 
 type Cache interface {
