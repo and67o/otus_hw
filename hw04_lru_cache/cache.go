@@ -68,7 +68,7 @@ func (l *lruCache) Clear() {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	l.queue= NewList()
+	l.queue = NewList()
 	l.items = make(map[Key]*listItem)
 }
 
