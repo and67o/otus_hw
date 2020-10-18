@@ -43,6 +43,9 @@ func Run(tasks []Task, n int, m int) error {
 		return ErrErrorsLimitExceeded
 	}
 
+	if n == 0 {
+		n = lenTasks
+	}
 	var wg sync.WaitGroup
 	chanTasks := make(chan Task)
 	consumer := make(chan Task)
