@@ -8,7 +8,7 @@ type Key string
 type Cache interface {
 	Set(key Key, value interface{}) bool
 	Get(key Key) (interface{}, bool)
-	Delete() bool
+	purge() bool
 	Clear()
 }
 
@@ -33,13 +33,13 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 	l.items[key] = item
 
 	if l.queue.Len() > l.capacity {
-		l.Delete()
+		l.purge()
 	}
 
 	return false
 }
 
-func (l *lruCache) Delete() bool {
+func (l *lruCache) purge() bool {
 	lastElem := l.queue.Back()
 
 	if lastElem != nil {
@@ -68,12 +68,8 @@ func (l *lruCache) Clear() {
 	l.lock.Lock()
 	defer l.lock.Unlock()
 
-	for key, ok := range l.items {
-		if ok != nil {
-			l.queue.Remove(l.items[key])
-			delete(l.items, key)
-		}
-	}
+	l.queue= NewList()
+	l.items = make(map[Key]*listItem)
 }
 
 type cacheItem struct {
