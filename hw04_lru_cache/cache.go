@@ -10,6 +10,7 @@ type Cache interface {
 	Get(key Key) (interface{}, bool)
 	purge() bool
 	Clear()
+	List() map[Key]*listItem
 }
 
 type lruCache struct {
@@ -17,6 +18,10 @@ type lruCache struct {
 	capacity int
 	queue    List
 	items    map[Key]*listItem
+}
+
+func (l *lruCache) List() map[Key]*listItem {
+	return l.items
 }
 
 func (l *lruCache) Set(key Key, value interface{}) bool {
