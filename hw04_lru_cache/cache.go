@@ -34,7 +34,7 @@ func (l *lruCache) Set(key Key, value interface{}) bool {
 		return true
 	}
 
-	item := l.queue.PushFront(&cacheItem{key, value})
+	item := l.queue.PushFront(&cacheItem{Key: key, Value: value})
 	l.items[key] = item
 
 	if l.queue.Len() > l.capacity {
