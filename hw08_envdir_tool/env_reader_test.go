@@ -48,6 +48,7 @@ func TestReadDir(t *testing.T) {
 		//new file
 		f, _:= os.Create("./testdata/env/CHECK")
 		defer func() {
+			f.Close()
 			os.Remove("./testdata/env/CHECK")
 		}()
 		_, _ = f.Write([]byte("check"))
@@ -55,6 +56,7 @@ func TestReadDir(t *testing.T) {
 		//new file with =
 		file, _:= os.Create("./testdata/env/CHECK=")
 		defer func() {
+			file.Close()
 			os.Remove("./testdata/env/CHECK=")
 		}()
 		_, _ = file.Write([]byte("check"))

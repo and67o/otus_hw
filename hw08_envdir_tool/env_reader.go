@@ -17,6 +17,7 @@ type Environment map[string]string
 // Variables represented as files where filename is name of variable, file first line is a value.
 func ReadDir(dir string) (Environment, error) {
 	env := make(Environment)
+
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return env, err
