@@ -27,12 +27,12 @@ func ReadDir(dir string) (Environment, error) {
 			continue
 		}
 		filepath := fmt.Sprintf("%s/%s", dir, file.Name())
-		line, err := getEnvValue(filepath)
+		envValue, err := getEnvValue(filepath)
 
 		if err != nil {
 			return env, nil
 		}
-		env[file.Name()] = line
+		env[file.Name()] = envValue
 	}
 
 	return env, nil
@@ -46,8 +46,8 @@ func getEnvValue(filepath string) (string, error) {
 	defer f.Close()
 
 	reader := bufio.NewReader(f)
-	line, _, err := reader.ReadLine()
 
+	line, _, err := reader.ReadLine()
 	if err != nil && !errors.Is(err, io.EOF) {
 		return "", err
 	}
