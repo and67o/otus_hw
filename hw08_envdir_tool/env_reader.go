@@ -20,7 +20,7 @@ func ReadDir(dir string) (Environment, error) {
 
 	files, err := ioutil.ReadDir(dir)
 	if err != nil {
-		return env, err
+		return env, fmt.Errorf("failed to read directory: %v", err)
 	}
 
 	for _, file := range files {
@@ -42,7 +42,7 @@ func ReadDir(dir string) (Environment, error) {
 func getEnvValue(filepath string) (string, error) {
 	f, err := os.Open(filepath)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to open file: %v", err)
 	}
 	defer f.Close()
 
@@ -50,7 +50,7 @@ func getEnvValue(filepath string) (string, error) {
 
 	line, _, err := reader.ReadLine()
 	if err != nil && !errors.Is(err, io.EOF) {
-		return "", err
+		return "", fmt.Errorf("failed to handle line: %v", err)
 	}
 
 	return handleLine(line), nil
