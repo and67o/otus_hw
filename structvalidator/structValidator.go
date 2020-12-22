@@ -1,4 +1,4 @@
-package hw09_struct_validator
+package structvalidator
 
 import (
 	"fmt"
@@ -9,7 +9,7 @@ import (
 )
 
 type Validator interface {
-	Validate(valueField reflect.Value, ruleValue string, typeParam reflect.StructField) error
+	Validate(valueField reflect.Value, ruleValue string) error
 }
 
 type MinValidator struct {
@@ -32,14 +32,12 @@ type RegexValidator struct {
 }
 
 type InValidator struct {
-	//cond string
+	cond interface{}
 }
 
-func (vIn *InValidator) Validate(valueField reflect.Value, ruleValue string, typeParam reflect.StructField) error {
+func (vIn *InValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	inValues := strings.Split(ruleValue, ",")
-
-
-	switch valueField.Kind() {
+	switch valueField.Kind() { // nolint: exhaustive
 	case reflect.String:
 		cond := valueField.String()
 		for _, inValue := range inValues {
@@ -47,22 +45,22 @@ func (vIn *InValidator) Validate(valueField reflect.Value, ruleValue string, typ
 				return nil
 			}
 		}
-		return &InValidator{}
+		return &InValidator{cond}
 	case reflect.Int:
 		cond := int(valueField.Int())
 		for _, inValue := range inValues {
-			intInValue,_ := strconv.Atoi(inValue)
+			intInValue, _ := strconv.Atoi(inValue)
 			if intInValue == cond {
 				return nil
 			}
 		}
-		fmt.Print( )
-		return &InValidator{}
+		return &InValidator{cond}
+	default:
+		return nil
 	}
-	return nil
 }
 
-func (vReg *RegexValidator) Validate(valueField reflect.Value, ruleValue string, typeParam reflect.StructField) error {
+func (vReg *RegexValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	emailRegEx := regexp.MustCompile(ruleValue)
 	cond := valueField.String()
 
@@ -74,7 +72,7 @@ func (vReg *RegexValidator) Validate(valueField reflect.Value, ruleValue string,
 	return &RegexValidator{cond}
 }
 
-func (vMax *MaxValidator) Validate(valueField reflect.Value, ruleValue string, typeParam reflect.StructField) error {
+func (vMax *MaxValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	max, err := strconv.Atoi(ruleValue)
 	if err != nil {
 		return err
@@ -89,14 +87,13 @@ func (vMax *MaxValidator) Validate(valueField reflect.Value, ruleValue string, t
 	return &MaxValidator{max, cond}
 }
 
-func (vMin *MinValidator) Validate(valueField reflect.Value, ruleValue string, typeParam reflect.StructField) error {
+func (vMin *MinValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	min, err := strconv.Atoi(ruleValue)
 	if err != nil {
 		return err
 	}
 
 	cond := int(valueField.Int())
-	fmt.Print(cond, min, cond >= cond, 99999)
 
 	if cond >= min {
 		return nil
@@ -105,13 +102,13 @@ func (vMin *MinValidator) Validate(valueField reflect.Value, ruleValue string, t
 	return &MinValidator{min, cond}
 }
 
-func (vLen *LenValidator) Validate(valueField reflect.Value, ruleValue string, typeParam reflect.StructField) error {
+func (vLen *LenValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	lenString, err := strconv.Atoi(ruleValue)
 	if err != nil {
 		return err
 	}
 
-	switch valueField.Kind() {
+	switch valueField.Kind() { // nolint: exhaustive
 	case reflect.String:
 		cond := valueField.String()
 		if len(cond) == lenString {
@@ -149,5 +146,5 @@ func (vReg *RegexValidator) Error() string {
 }
 
 func (vIn *InValidator) Error() string {
-	return "[in] value not in"
+	return fmt.Sprintf("[in] value %s not in", vIn.cond)
 }

@@ -1,4 +1,4 @@
-package hw09_struct_validator //nolint:golint,stylecheck
+package structvalidator //nolint:golint,stylecheck
 import (
 	"errors"
 	"fmt"
@@ -39,6 +39,7 @@ func Validate(v interface{}) error {
 
 	for i := 0; i < rValue.NumField(); i++ {
 		valueField := rValue.Field(i)
+
 		if !valueField.CanInterface() {
 			continue
 		}
@@ -51,19 +52,17 @@ func Validate(v interface{}) error {
 
 		rules := strings.Split(validateTags, "|")
 		for _, rule := range rules {
-			ruleStruct := strings.Split(rule, ":")
-			if len(ruleStruct) != 2 {
-				return ErrorNotValidDefinition
+			ruleKey, ruleValue, err := getRule(rule)
+			if err != nil {
+				return err
 			}
-
-			ruleKey := ruleStruct[0]
-			ruleValue := ruleStruct[1]
 
 			validator := getValidator(ruleKey)
 			if validator == nil {
 				return ErrorUnknownRuleKey
 			}
-			err := validator.Validate(valueField, ruleValue, structFieldParam)
+
+			err = validator.Validate(valueField, ruleValue)
 			if err != nil {
 				validationErrors = append(validationErrors, ValidationError{structFieldParam.Name, err})
 			}
@@ -74,8 +73,15 @@ func Validate(v interface{}) error {
 		return validationErrors
 	}
 
-	fmt.Print("\nFINISH")
 	return nil
+}
+
+func getRule(rule string) (string, string, error) {
+	ruleStruct := strings.Split(rule, ":")
+	if len(ruleStruct) != 2 {
+		return "", "", ErrorNotValidDefinition
+	}
+	return ruleStruct[0], ruleStruct[1], nil
 }
 
 func getValidator(ruleName string) Validator {

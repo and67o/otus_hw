@@ -1,4 +1,4 @@
-package hw09_struct_validator //nolint:golint,stylecheck
+package structvalidator //nolint:golint,stylecheck
 
 import (
 	"encoding/json"
@@ -12,13 +12,21 @@ type UserRole string
 // Test the function on different structures and other types.
 type (
 	User struct {
-		ID string `json:"id" validate:"len:36"`
+		ID     string `json:"id" validate:"len:36"`
 		Name   string
 		Age    int      `validate:"min:18|max:50"`
 		Email  string   `validate:"regexp:^\\w+@\\w+\\.\\w+$"`
 		Role   UserRole `validate:"in:admin,stuff"`
 		Phones []string `validate:"len:11"`
 		meta   json.RawMessage
+	}
+
+	WrongUser struct {
+		Age int `validate:"len:1:2:3"`
+	}
+
+	WrongApp struct {
+		Version string `validate:"test:5"`
 	}
 
 	App struct {
@@ -37,7 +45,7 @@ type (
 	}
 )
 
-func TestValidate2(t *testing.T) {
+func TestValidateErrors(t *testing.T) {
 	tests := []struct {
 		in          interface{}
 		expectedErr error
@@ -45,6 +53,14 @@ func TestValidate2(t *testing.T) {
 		{
 			in:          "test",
 			expectedErr: ErrorNotStruct,
+		},
+		{
+			in:          WrongUser{Age: 23},
+			expectedErr: ErrorNotValidDefinition,
+		},
+		{
+			in:          WrongApp{Version: "123"},
+			expectedErr: ErrorUnknownRuleKey,
 		},
 	}
 
@@ -56,7 +72,46 @@ func TestValidate2(t *testing.T) {
 	}
 }
 
-func TestValidateErrors(t *testing.T) {
+func TestValidatePass(t *testing.T) {
+	tests := []struct {
+		in          interface{}
+		expectedErr error
+	}{
+		{
+			in:User{
+				ID:     "123456789123456789123456789123456789",
+				Name:   "Oleg",
+				Age:    24,
+				Email:  "test@mail.ru",
+				Role:   "admin",
+				Phones: []string{"89204653384"},
+				meta:   nil,
+			},
+		},
+		{
+			in: Response{Code: 200, Body: "test"},
+		},
+		{
+			in: App{Version: "1.2.3"},
+		},
+		{
+			in: Token{},
+		},
+		{
+			in: Token{
+				Header: []byte("any"),
+			},
+		},
+	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
+			err := Validate(tt.in)
+			require.Nil(t, err)
+		})
+	}
+}
+
+func TestValidateStructErrors(t *testing.T) {
 	tests := []struct {
 		in          interface{}
 		expectedErr error
@@ -64,7 +119,7 @@ func TestValidateErrors(t *testing.T) {
 		{
 			in: Response{Code: 201, Body: "test"},
 			expectedErr: ValidationErrors{
-				ValidationError{Field: "Code", Err: &InValidator{}},
+				ValidationError{Field: "Code", Err: &InValidator{201}},
 			},
 		},
 		{
@@ -79,7 +134,7 @@ func TestValidateErrors(t *testing.T) {
 				ValidationError{Field: "ID", Err: &LenValidator{36, "1"}},
 				ValidationError{Field: "Age", Err: &MinValidator{18, 0}},
 				ValidationError{Field: "Email", Err: &RegexValidator{""}},
-				ValidationError{Field: "Role", Err: &InValidator{}},
+				ValidationError{Field: "Role", Err: &InValidator{""}},
 			},
 		},
 		{
@@ -88,7 +143,7 @@ func TestValidateErrors(t *testing.T) {
 				ValidationError{Field: "ID", Err: &LenValidator{36, "1"}},
 				ValidationError{Field: "Age", Err: &MinValidator{18, 9}},
 				ValidationError{Field: "Email", Err: &RegexValidator{""}},
-				ValidationError{Field: "Role", Err: &InValidator{}},
+				ValidationError{Field: "Role", Err: &InValidator{""}},
 			},
 		},
 		{
@@ -96,20 +151,20 @@ func TestValidateErrors(t *testing.T) {
 			expectedErr: ValidationErrors{
 				ValidationError{Field: "Age", Err: &MaxValidator{50, 56}},
 				ValidationError{Field: "Email", Err: &RegexValidator{""}},
-				ValidationError{Field: "Role", Err: &InValidator{}},
+				ValidationError{Field: "Role", Err: &InValidator{""}},
 			},
 		},
 		{
 			in: User{ID: "123456789123456789123456789123456789", Name: "Oleg", Age: 45, Email: "oleil.ru"},
 			expectedErr: ValidationErrors{
 				ValidationError{Field: "Email", Err: &RegexValidator{"oleil.ru"}},
-				ValidationError{Field: "Role", Err: &InValidator{}},
+				ValidationError{Field: "Role", Err: &InValidator{""}},
 			},
 		},
 		{
 			in: User{ID: "123456789123456789123456789123456789", Name: "Oleg", Age: 45, Email: "oleg@mail.ru", Role: "oleg"},
 			expectedErr: ValidationErrors{
-				ValidationError{Field: "Role", Err: &InValidator{}},
+				ValidationError{Field: "Role", Err: &InValidator{"oleg"}},
 			},
 		},
 		{
@@ -136,7 +191,6 @@ func TestValidateErrors(t *testing.T) {
 	for i, tt := range tests {
 		t.Run(fmt.Sprintf("case %d", i), func(t *testing.T) {
 			err := Validate(tt.in)
-			fmt.Print(err,"\n")
 			errors := err.(ValidationErrors)
 
 			for index, e := range tt.expectedErr.(ValidationErrors) {
