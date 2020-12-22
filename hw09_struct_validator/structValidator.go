@@ -1,4 +1,4 @@
-package structvalidator
+package hw09_struct_validator
 
 import (
 	"fmt"
