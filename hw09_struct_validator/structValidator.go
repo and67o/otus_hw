@@ -75,7 +75,7 @@ func (vReg *RegexValidator) Validate(valueField reflect.Value, ruleValue string)
 func (vMax *MaxValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	max, err := strconv.Atoi(ruleValue)
 	if err != nil {
-		return err
+		return fmt.Errorf("strconv error: %w", err)
 	}
 
 	cond := int(valueField.Int())
@@ -90,7 +90,7 @@ func (vMax *MaxValidator) Validate(valueField reflect.Value, ruleValue string) e
 func (vMin *MinValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	min, err := strconv.Atoi(ruleValue)
 	if err != nil {
-		return err
+		return fmt.Errorf("strconv error: %w", err)
 	}
 
 	cond := int(valueField.Int())
@@ -105,7 +105,7 @@ func (vMin *MinValidator) Validate(valueField reflect.Value, ruleValue string) e
 func (vLen *LenValidator) Validate(valueField reflect.Value, ruleValue string) error {
 	lenString, err := strconv.Atoi(ruleValue)
 	if err != nil {
-		return err
+		return fmt.Errorf("strconv error: %w", err)
 	}
 
 	switch valueField.Kind() { // nolint: exhaustive

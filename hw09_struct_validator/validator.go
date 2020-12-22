@@ -64,7 +64,7 @@ func Validate(v interface{}) error {
 
 			err = validator.Validate(valueField, ruleValue)
 			if err != nil {
-				validationErrors = append(validationErrors, ValidationError{structFieldParam.Name, err})
+				validationErrors = append(validationErrors, ValidationError{Field: structFieldParam.Name, Err: err})
 			}
 		}
 	}
