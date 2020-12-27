@@ -49,7 +49,7 @@ func (t *telnetClient) Close() error {
 		return nil
 	}
 	err := t.connection.Close()
-	return err
+	return fmt.Errorf("close connection error: %w", err)
 }
 
 func (t *telnetClient) Send() error {
@@ -58,7 +58,7 @@ func (t *telnetClient) Send() error {
 		text := scanner.Text()
 		_, err := t.connection.Write([]byte(text + "\n"))
 		if err != nil {
-			return err
+			return fmt.Errorf("send error: %w", err)
 		}
 	}
 	return nil
@@ -69,5 +69,5 @@ func (t *telnetClient) Receive() error {
 		return nil
 	}
 	_, err := io.Copy(t.out, t.connection)
-	return err
+	return fmt.Errorf("receive error: %w", err)
 }
