@@ -195,8 +195,8 @@ func TestValidateStructErrors(t *testing.T) {
 
 			for index, e := range tt.expectedErr.(ValidationErrors) {
 				validationError := errors[index]
-				require.Equal(t, validationError.Field, e.Field)
-				require.Equal(t, validationError.Err, e.Err)
+				require.Equal(t, e.Field, validationError.Field)
+				require.Equal(t, e.Err, validationError.Err)
 			}
 		})
 	}

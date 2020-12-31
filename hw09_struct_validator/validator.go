@@ -11,6 +11,8 @@ type ValidationError struct {
 	Err   error
 }
 
+const structTag = "validate"
+
 var ErrorNotStruct = errors.New("not struct")
 var ErrorNotValidDefinition = errors.New("not valid definition")
 var ErrorUnknownRuleKey = errors.New("unknown rule key")
@@ -45,7 +47,7 @@ func Validate(v interface{}) error {
 		}
 		structFieldParam := rType.Field(i)
 
-		validateTags := structFieldParam.Tag.Get("validate")
+		validateTags := structFieldParam.Tag.Get(structTag)
 		if validateTags == "" {
 			continue
 		}
