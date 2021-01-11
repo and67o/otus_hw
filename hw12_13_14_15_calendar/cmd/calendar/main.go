@@ -3,20 +3,21 @@ package main
 import (
 	"context"
 	"flag"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/logger"
+	internalhttp "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/http"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/create"
+	"log"
 	"os"
 	"os/signal"
 	"time"
-
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/app"
-	"github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/logger"
-	internalhttp "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/server/http"
-	memorystorage "github.com/fixme_my_friend/hw12_13_14_15_calendar/internal/storage/memory"
 )
 
 var configFile string
 
 func init() {
-	flag.StringVar(&configFile, "config", "/etc/calendar/config.toml", "Path to configuration file")
+	flag.StringVar(&configFile, "config", "./configs/config.toml", "Path to configuration file")
 }
 
 func main() {
@@ -27,36 +28,51 @@ func main() {
 		return
 	}
 
-	config := NewConfig()
-	logg := logger.New(config.Logger.Level)
+	config, err := configuration.New(configFile)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-	storage := memorystorage.New()
+	logg, err := logger.New(config.Logger)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	storage, err := create.New(config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	calendar := app.New(logg, storage)
 
-	server := internalhttp.NewServer(calendar)
+	server := internalhttp.NewServer(calendar, config.Server)
+
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go func() {
-		signals := make(chan os.Signal, 1)
-		signal.Notify(signals)
-
-		<-signals
-		signal.Stop(signals)
-		cancel()
-
-		ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
-		defer cancel()
-
-		if err := server.Stop(ctx); err != nil {
-			logg.Error("failed to stop http server: " + err.Error())
-		}
-	}()
+	go watchSignals(server, logg, cancel)
 
 	logg.Info("calendar is running...")
 
-	if err := server.Start(ctx); err != nil {
+	err = server.Start(ctx)
+	if err != nil {
 		logg.Error("failed to start http server: " + err.Error())
 		os.Exit(1)
+	}
+}
+
+func watchSignals(server *internalhttp.Server, logg *logger.Logger, cancel context.CancelFunc) {
+	signals := make(chan os.Signal, 1)
+	signal.Notify(signals)
+
+	<-signals
+	signal.Stop(signals)
+	cancel()
+
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
+	defer cancel()
+
+	if err := server.Stop(ctx); err != nil {
+		logg.Error("failed to stop http server: " + err.Error())
 	}
 }
