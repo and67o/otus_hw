@@ -2,11 +2,12 @@ package sqlstorage
 
 import (
 	"fmt"
+	"time"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	_ "github.com/jackc/pgx/v4/stdlib"
 	"github.com/jmoiron/sqlx"
-	"time"
 )
 
 type Storage struct {
@@ -44,7 +45,7 @@ func dataSourceName(config configuration.DBConf) string {
 		config.User,
 		config.Pass,
 		config.Host,
-		config.DbName,
+		config.DBName,
 	)
 }
 
@@ -81,11 +82,8 @@ func (s *Storage) Delete(id string) error {
 	return nil
 }
 
-
 func (s *Storage) DayEvents(time time.Time) []storage.Event {
 	panic("implement me")
-	//y,m,d:=time.Date()
-	//_, err:=s.db.Exec("Select * from events w")
 }
 
 func (s *Storage) WeekEvents(time time.Time) []storage.Event {

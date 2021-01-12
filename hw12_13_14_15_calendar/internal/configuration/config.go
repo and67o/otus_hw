@@ -2,6 +2,8 @@ package configuration
 
 import (
 	"errors"
+	"fmt"
+
 	"github.com/spf13/viper"
 )
 
@@ -21,12 +23,12 @@ func New(path string) (Config, error) {
 	err := viper.ReadInConfig()
 
 	if err != nil {
-		return configuration, err
+		return configuration, fmt.Errorf("viper read error: %w", err)
 	}
 
 	err = viper.Unmarshal(&configuration)
 	if err != nil {
-		return configuration, err
+		return configuration, fmt.Errorf("viper unmarshal error: %w", err)
 	}
 
 	return configuration, nil

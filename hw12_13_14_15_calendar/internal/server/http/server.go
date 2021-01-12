@@ -3,11 +3,11 @@ package internalhttp
 import (
 	"context"
 	"encoding/json"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"net"
 	"net/http"
 
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/gorilla/mux"
 )
 
@@ -40,6 +40,7 @@ func NewServer(app *app.App, config configuration.HTTPConf) *Server {
 }
 
 func (s *Server) Start(ctx context.Context) error {
+	s.router.Use(s.loggingMiddleware)
 	s.router.HandleFunc("/hello", s.helloHandler).Methods("GET")
 
 	err := http.ListenAndServe(s.server.Addr, s.server.Handler)

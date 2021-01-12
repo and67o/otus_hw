@@ -2,9 +2,10 @@ package memorystorage
 
 import (
 	"errors"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	"sync"
 	"time"
+
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 )
 
 type Storage struct {

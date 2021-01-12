@@ -1,8 +1,8 @@
 package logger
 
 import (
+	"fmt"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
-
 	"go.uber.org/zap"
 )
 
@@ -31,7 +31,7 @@ func New(configuration configuration.LoggerConf) (*Logger, error) {
 
 	l, err := config.Build()
 	if err != nil {
-		return logger, err
+		return logger, fmt.Errorf("config build error: %w", err)
 	}
 
 	logger.logger = l

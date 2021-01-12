@@ -2,11 +2,12 @@ package create
 
 import (
 	"errors"
+	"time"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	memorystorage "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/memory"
 	sqlstorage "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/sql"
-	"time"
 )
 
 const (
@@ -31,7 +32,7 @@ type Storage interface {
 func New(config configuration.Config) (Storage, error) {
 	switch config.Memory.Type {
 	case sqlType:
-		return sqlstorage.New(config.Db)
+		return sqlstorage.New(config.DB)
 	case memoryType:
 		return memorystorage.New(), nil
 	default:

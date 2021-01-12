@@ -8,7 +8,7 @@ import (
 
 func TestLogger(t *testing.T) {
 	config := configuration.LoggerConf{
-		File:    "../../logs/log.log",
+		File:    "./logs/log.log",
 	}
 
 	_, err := New(config)

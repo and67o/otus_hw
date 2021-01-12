@@ -10,7 +10,7 @@ func TestStorage(t *testing.T) {
 	config:= configuration.DBConf{
 		User:   "admin",
 		Pass:   "123",
-		DbName: "go",
+		DBName: "go",
 		Host:   "localhost",
 	}
 	_, err := New(config)

@@ -3,15 +3,16 @@ package main
 import (
 	"context"
 	"flag"
+	"log"
+	"os"
+	"os/signal"
+	"time"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/logger"
 	internalhttp "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/http"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/create"
-	"log"
-	"os"
-	"os/signal"
-	"time"
 )
 
 var configFile string

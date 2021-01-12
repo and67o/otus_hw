@@ -16,7 +16,7 @@ func TestStorage(t *testing.T) {
 		Date:         time.Time{},
 		Duration:     0,
 		Description:  "",
-		OwnerId:      "",
+		OwnerID:      "",
 		NotifyBefore: 0,
 	}
 
