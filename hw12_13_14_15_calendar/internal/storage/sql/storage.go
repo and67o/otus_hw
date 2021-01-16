@@ -70,7 +70,7 @@ func (s *Storage) Create(e storage.Event) error {
 		e.NotifyBefore,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("create: %w", err)
 	}
 	return nil
 }
@@ -86,7 +86,7 @@ func (s *Storage) Update(e storage.Event) error {
 		e.ID,
 	)
 	if err != nil {
-		return err
+		return fmt.Errorf("update: %w", err)
 	}
 	return nil
 }
@@ -94,7 +94,7 @@ func (s *Storage) Update(e storage.Event) error {
 func (s *Storage) Delete(id string) error {
 	_, err := s.db.Exec("DELETE FROM events WHERE id=?", id)
 	if err != nil {
-		return err
+		return fmt.Errorf("delete: %w", err)
 	}
 	return nil
 }
@@ -104,7 +104,7 @@ func (s *Storage) DayEvents(t time.Time) ([]storage.Event, error) {
 
 	res, err := s.db.Query("SELECT * FROM events WHERE YEAR(`date`) = ? AND MONTH(`date`) = ? and DAY(`date`) = ?", y, m, d)
 	if res == nil {
-		return nil, err
+		return nil, fmt.Errorf("day events: %w", err)
 	}
 
 	return handleResult(res)
@@ -115,7 +115,7 @@ func (s *Storage) WeekEvents(t time.Time) ([]storage.Event, error) {
 
 	res, err := s.db.Query("SELECT * FROM events WHERE YEAR(`date`) = ? AND WEEK(`date`) = ?", y, w)
 	if res == nil {
-		return nil, err
+		return nil, fmt.Errorf("week events: %w", err)
 	}
 
 	return handleResult(res)
@@ -126,7 +126,7 @@ func (s *Storage) MonthEvents(t time.Time) ([]storage.Event, error) {
 
 	res, err := s.db.Query("SELECT * FROM events WHERE YEAR(`date`) = ? AND MONTH(`date`) = ?", y, m)
 	if res == nil {
-		return nil, err
+		return nil, fmt.Errorf("month events: %w", err)
 	}
 
 	return handleResult(res)
@@ -143,12 +143,12 @@ func handleResult(res *sql.Rows) ([]storage.Event, error) {
 
 		err := res.Scan(&e.ID, &e.Title, &dateSQLRaw, &durationSQLRaw, &e.Description, &e.OwnerID, &notifyBeforeSQLRaw)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan: %w", err)
 		}
 
 		e.Date, err = time.Parse(format, dateSQLRaw)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("date parse: %w", err)
 		}
 
 		e.NotifyBefore = time.Duration(notifyBeforeSQLRaw)
