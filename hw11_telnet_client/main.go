@@ -56,10 +56,7 @@ func main() {
 	case <-signalsChan:
 		signal.Stop(signalsChan)
 	case err = <-errorsChan:
-		if err != nil {
-			log.Fatal(err)
-		}
-		_, _ = fmt.Fprintf(os.Stderr, "End\n")
+		_, _ = fmt.Fprintf(os.Stderr, "error:%s\n", err)
 	}
 }
 
