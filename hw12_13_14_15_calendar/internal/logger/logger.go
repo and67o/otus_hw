@@ -1,9 +1,13 @@
 package logger
 
 import (
+	"errors"
 	"fmt"
+	"strings"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 type Logger struct {
@@ -18,6 +22,12 @@ type Interface interface {
 }
 
 const outPut = "stderr"
+const (
+	levelDebug = "DEBUG"
+	levelError = "ERROR"
+	levelInfo  = "INFO"
+	levelWarn  = "WARN"
+)
 
 func New(configuration configuration.LoggerConf) (*Logger, error) {
 	var logger = new(Logger)
@@ -29,13 +39,36 @@ func New(configuration configuration.LoggerConf) (*Logger, error) {
 	config.OutputPaths = []string{outPut}
 	config.OutputPaths = []string{configuration.File}
 
+	lvl, err := setLevel(configuration.Level)
+	if err != nil {
+		return nil, fmt.Errorf("level error: %w", err)
+	}
+	config.Level = *lvl
+
 	l, err := config.Build()
 	if err != nil {
-		return logger, fmt.Errorf("config build error: %w", err)
+		return nil, fmt.Errorf("config build error: %w", err)
 	}
 
 	logger.logger = l
 	return logger, nil
+}
+
+func setLevel(level string) (*zap.AtomicLevel, error) {
+	var lvl zap.AtomicLevel
+	switch strings.ToUpper(level) {
+	case levelDebug:
+		lvl = zap.NewAtomicLevelAt(zapcore.DebugLevel)
+	case levelError:
+		lvl = zap.NewAtomicLevelAt(zapcore.ErrorLevel)
+	case levelInfo:
+		lvl = zap.NewAtomicLevelAt(zapcore.InfoLevel)
+	case levelWarn:
+		lvl = zap.NewAtomicLevelAt(zapcore.WarnLevel)
+	default:
+		return nil, errors.New("not found log level")
+	}
+	return &lvl, nil
 }
 
 func getConfig(isProd bool) zap.Config {

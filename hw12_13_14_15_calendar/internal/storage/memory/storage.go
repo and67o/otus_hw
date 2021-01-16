@@ -73,7 +73,7 @@ func (s *Storage) Delete(id string) error {
 	return nil
 }
 
-func (s *Storage) DayEvents(time time.Time) []storage.Event {
+func (s *Storage) DayEvents(time time.Time) ([]storage.Event, error) {
 	var events []storage.Event
 	y, m, d := time.Date()
 
@@ -85,10 +85,10 @@ func (s *Storage) DayEvents(time time.Time) []storage.Event {
 		}
 	}
 
-	return events
+	return events, nil
 }
 
-func (s *Storage) WeekEvents(time time.Time) []storage.Event {
+func (s *Storage) WeekEvents(time time.Time) ([]storage.Event, error) {
 	var events []storage.Event
 	y, w := time.ISOWeek()
 
@@ -100,10 +100,10 @@ func (s *Storage) WeekEvents(time time.Time) []storage.Event {
 		}
 	}
 
-	return events
+	return events, nil
 }
 
-func (s *Storage) MonthEvents(time time.Time) []storage.Event {
+func (s *Storage) MonthEvents(time time.Time) ([]storage.Event, error) {
 	var events []storage.Event
 	y, m, _ := time.Date()
 
@@ -115,5 +115,5 @@ func (s *Storage) MonthEvents(time time.Time) []storage.Event {
 		}
 	}
 
-	return events
+	return events, nil
 }

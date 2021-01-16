@@ -27,7 +27,7 @@ func NewServer(app *app.App, config configuration.HTTPConf) *Server {
 	router := mux.NewRouter()
 
 	address := net.JoinHostPort(config.Host, config.Port)
-	server := &http.Server{
+	server := &http.Server{ // nolint: exhaustiveness
 		Handler: router,
 		Addr:    address,
 	}

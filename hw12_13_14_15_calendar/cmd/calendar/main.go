@@ -58,7 +58,7 @@ func main() {
 	err = server.Start(ctx)
 	if err != nil {
 		logg.Error("failed to start http server: " + err.Error())
-		os.Exit(1)
+		os.Exit(1) //nolint
 	}
 }
 

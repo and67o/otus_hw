@@ -28,4 +28,5 @@ type DBConf struct {
 	Pass   string `mapstructure:"db_password"`
 	DBName string `mapstructure:"db_database"`
 	Host   string `mapstructure:"db_host"`
+	Port   int    `mapstructure:"db_port"`
 }

@@ -24,9 +24,9 @@ type Storage interface {
 	Create(e storage.Event) error
 	Update(e storage.Event) error
 	Delete(id string) error
-	DayEvents(time time.Time) []storage.Event
-	WeekEvents(time time.Time) []storage.Event
-	MonthEvents(time time.Time) []storage.Event
+	DayEvents(time time.Time) ([]storage.Event, error)
+	WeekEvents(time time.Time) ([]storage.Event, error)
+	MonthEvents(time time.Time) ([]storage.Event, error)
 }
 
 func New(config configuration.Config) (Storage, error) {
