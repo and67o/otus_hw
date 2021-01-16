@@ -55,13 +55,11 @@ func main() {
 	select {
 	case <-signalsChan:
 		signal.Stop(signalsChan)
-		return
 	case err = <-errorsChan:
 		if err != nil {
 			log.Fatal(err)
 		}
 		_, _ = fmt.Fprintf(os.Stderr, "End\n")
-		return
 	}
 }
 
