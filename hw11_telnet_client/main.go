@@ -1,8 +1,8 @@
 package main
 
 import (
-	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -17,18 +17,20 @@ func init() {
 	flag.DurationVar(&timeout, "timeout", 10*time.Second, "timeout connection")
 }
 
+const (
+	minArgs = 3
+	maxArgs = 4
+)
+
 func main() {
 	flag.Parse()
 
 	args := os.Args
-	if len(args) != 4 {
+	if (len(args) > maxArgs) || (len(args) < minArgs) {
 		log.Fatal("count of variable error")
 	}
-
-	address := net.JoinHostPort(os.Args[2], os.Args[3])
-
-	bcg := context.Background()
-	ctx, cancel := context.WithCancel(bcg)
+	host, port := os.Args[len(os.Args)-2], os.Args[len(os.Args)-1]
+	address := net.JoinHostPort(host, port)
 
 	client := NewTelnetClient(address, timeout, os.Stdin, os.Stdout)
 
@@ -43,35 +45,30 @@ func main() {
 		}
 	}()
 
-	go receive(client, cancel)
+	errorsChan := make(chan error)
+	go send(client, errorsChan)
+	go receive(client, errorsChan)
 
-	go send(client, cancel)
-
-	watchSignal(ctx, cancel)
-}
-
-func watchSignal(ctx context.Context, cancel context.CancelFunc) {
 	signalsChan := make(chan os.Signal, 1)
-	signal.Notify(signalsChan, syscall.SIGINT, syscall.SIGTERM)
+	signal.Notify(signalsChan, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 
 	select {
 	case <-signalsChan:
-		cancel()
-	case <-ctx.Done():
-		close(signalsChan)
+		signal.Stop(signalsChan)
+		return
+	case err = <-errorsChan:
+		if err != nil {
+			log.Fatal(err)
+		}
+		_, _ = fmt.Fprintf(os.Stderr, "End\n")
+		return
 	}
 }
 
-func receive(client TelnetClient, cancel context.CancelFunc) {
-	err := client.Receive()
-	if err != nil {
-		cancel()
-	}
+func receive(client TelnetClient, errorsChan chan error) {
+	errorsChan <- client.Receive()
 }
 
-func send(client TelnetClient, cancel context.CancelFunc) {
-	err := client.Send()
-	if err != nil {
-		cancel()
-	}
+func send(client TelnetClient, errorsChan chan error) {
+	errorsChan <- client.Send()
 }
