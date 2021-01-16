@@ -3,6 +3,7 @@ package internalhttp
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net"
 	"net/http"
 
@@ -45,7 +46,7 @@ func (s *Server) Start(ctx context.Context) error {
 
 	err := http.ListenAndServe(s.server.Addr, s.server.Handler)
 	if err != nil {
-		return err
+		return fmt.Errorf("server start: %w", err)
 	}
 
 	<-ctx.Done()
@@ -55,7 +56,7 @@ func (s *Server) Start(ctx context.Context) error {
 func (s *Server) Stop(ctx context.Context) error {
 	err := s.server.Shutdown(ctx)
 	if err != nil {
-		return err
+		return fmt.Errorf("server stop: %w", err)
 	}
 	return nil
 }
