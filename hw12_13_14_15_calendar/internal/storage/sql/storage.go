@@ -21,12 +21,12 @@ const format = "2006-01-02 15:04:05"
 func New(config configuration.DBConf) (*Storage, error) {
 	db, err := sqlx.Open(driverName, dataSourceName(config))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("connect db: %w", err)
 	}
 
 	err = db.Ping()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("check ping db: %w", err)
 	}
 
 	return &Storage{db: db}, nil
@@ -53,7 +53,7 @@ func dataSourceName(config configuration.DBConf) string {
 func (s *Storage) Close() error {
 	err := s.db.Close()
 	if err != nil {
-		return err
+		return fmt.Errorf("close connect: %w", err)
 	}
 
 	return nil
