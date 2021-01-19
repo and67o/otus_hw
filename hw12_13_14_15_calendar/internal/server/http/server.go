@@ -2,31 +2,70 @@ package internalhttp
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
+	"net"
+	"net/http"
+
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
+	"github.com/gorilla/mux"
 )
 
 type Server struct {
-	// TODO
+	app    *app.App
+	server *http.Server
+	router *mux.Router
 }
 
 type Application interface {
-	// TODO
+	Start(ctx context.Context) error
+	Stop(ctx context.Context) error
+	helloHandler(w http.ResponseWriter, r *http.Request)
 }
 
-func NewServer(app Application) *Server {
-	return &Server{}
-}
+func NewServer(app *app.App, config configuration.HTTPConf) *Server {
+	router := mux.NewRouter()
 
-func (s *Server) Start(ctx context.Context) error {
-	// TODO
-	select {
-	case <-ctx.Done():
-		return nil
+	address := net.JoinHostPort(config.Host, config.Port)
+	server := &http.Server{ // nolint: exhaustivestruct
+		Handler: router,
+		Addr:    address,
+	}
+
+	return &Server{
+		app:    app,
+		server: server,
+		router: router,
 	}
 }
 
-func (s *Server) Stop(ctx context.Context) error {
-	// TODO
+func (s *Server) Start(ctx context.Context) error {
+	s.router.Use(s.loggingMiddleware)
+	s.router.HandleFunc("/hello", s.helloHandler).Methods("GET")
+
+	err := http.ListenAndServe(s.server.Addr, s.server.Handler)
+	if err != nil {
+		return fmt.Errorf("server start: %w", err)
+	}
+
+	<-ctx.Done()
 	return nil
 }
 
-// TODO
+func (s *Server) Stop(ctx context.Context) error {
+	err := s.server.Shutdown(ctx)
+	if err != nil {
+		return fmt.Errorf("server stop: %w", err)
+	}
+	return nil
+}
+
+func (s *Server) helloHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	err := json.NewEncoder(w).Encode(map[string]string{"message": "hello-world"})
+	if err != nil {
+		s.app.Logger.Error("error sending response")
+	}
+}
