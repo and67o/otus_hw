@@ -2,6 +2,68 @@ syntax = "proto3";
 
 package event;
 
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
 message Event {
-    // TODO
+  string id = 1;
+  string title = 2;
+  google.protobuf.Timestamp date = 3;
+  google.protobuf.Duration duration = 4;
+  string description = 5;
+  string ownerId = 6;
+  google.protobuf.Duration notifyBefore = 7;
+}
+
+service Calendar {
+  rpc Create(createRequest) returns (createResponse);
+  rpc Delete(deleteRequest) returns (deleteResponse);
+  rpc Update(updateRequest) returns (updateResponse);
+
+  rpc DayEvents(dayEventsRequest) returns (dayEventsResponse);
+  rpc WeekEvents(weekEventsRequest) returns (weekEventsResponse);
+  rpc MonthEvents(monthEventsRequest) returns (monthEventsResponse);
+}
+
+message createRequest {
+  Event event = 1;
+}
+
+message createResponse {}
+
+message deleteRequest {
+  int64 id = 1;
+}
+
+message deleteResponse {}
+
+message updateRequest {
+  int64 id = 1;
+  Event event = 2;
+}
+
+message updateResponse {}
+
+message dayEventsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+
+message dayEventsResponse {
+  repeated Event events = 1;
+}
+
+message weekEventsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+
+message weekEventsResponse {
+  repeated Event events = 1;
+}
+
+message monthEventsRequest {
+  google.protobuf.Timestamp date = 1;
+}
+
+message monthEventsResponse {
+  repeated Event events = 1;
 }
