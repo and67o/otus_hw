@@ -1,36 +1,20 @@
 package app
 
 import (
-	"context"
-
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/logger"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/create"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
+	pb "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/grpc/pb"
 )
 
 type App struct {
-	Logger  Logger
-	Storage Storage
+	Logger  interfaces.Logger
+	Storage interfaces.Storage
+
+	pb.UnimplementedCalendarServer
 }
 
-type Logger interface {
-	logger.Interface
-}
-
-type Storage interface {
-	create.Storage
-}
-
-func New(logger Logger, storage Storage) *App {
+func New(logger interfaces.Logger, storage interfaces.Storage) *App {
 	return &App{
 		Logger:  logger,
 		Storage: storage,
 	}
 }
-
-func (a *App) CreateEvent(ctx context.Context, id string, title string) error {
-	// TODO
-	return nil
-	// return a.storage.CreateEvent(storage.Event{ID: id, Title: title})
-}
-
-// TODO

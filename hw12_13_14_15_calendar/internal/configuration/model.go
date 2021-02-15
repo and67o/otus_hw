@@ -1,10 +1,13 @@
 package configuration
 
+type MemoryType string
+
 type Config struct {
 	Logger LoggerConf
-	Server HTTPConf
+	Rest   HTTPConf
 	DB     DBConf
 	Memory Memory
+	GRPC   GRPCConf
 }
 
 type LoggerConf struct {
@@ -19,8 +22,13 @@ type HTTPConf struct {
 	Port string `mapstructure:"server_port"`
 }
 
+type GRPCConf struct {
+	Host string `mapstructure:"server_host"`
+	Port string `mapstructure:"server_port"`
+}
+
 type Memory struct {
-	Type string `mapstructure:"memory_type"`
+	Type MemoryType `mapstructure:"memory_type"`
 }
 
 type DBConf struct {

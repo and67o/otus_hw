@@ -3,6 +3,7 @@ package sqlstorage
 import (
 	"database/sql"
 	"fmt"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"time"
 
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
@@ -18,7 +19,7 @@ type Storage struct {
 const driverName = "mysql"
 const format = "2006-01-02 15:04:05"
 
-func New(config configuration.DBConf) (*Storage, error) {
+func New(config configuration.DBConf) (interfaces.Storage, error) {
 	db, err := sqlx.Open(driverName, dataSourceName(config))
 	if err != nil {
 		return nil, fmt.Errorf("connect db: %w", err)
@@ -75,15 +76,15 @@ func (s *Storage) Create(e storage.Event) error {
 	return nil
 }
 
-func (s *Storage) Update(e storage.Event) error {
+func (s *Storage) Update(id string, e storage.Event) error {
 	_, err := s.db.Exec("UPDATE events SET title=?, `date`=?, duration=?, description=?, owner_id=?, notify_before=? WHERE id=?",
 		e.Title,
-		e.Date.Format("2006-01-02 15:04:05"),
+		e.Date.Format(format),
 		e.Duration,
 		e.Description,
 		e.OwnerID,
 		e.NotifyBefore,
-		e.ID,
+		id,
 	)
 	if err != nil {
 		return fmt.Errorf("update: %w", err)
@@ -133,7 +134,7 @@ func (s *Storage) MonthEvents(t time.Time) ([]storage.Event, error) {
 }
 
 func handleResult(res *sql.Rows) ([]storage.Event, error) {
-	events := make([]storage.Event, 0)
+	var events []storage.Event
 
 	for res.Next() {
 		var e storage.Event
@@ -157,5 +158,5 @@ func handleResult(res *sql.Rows) ([]storage.Event, error) {
 		events = append(events, e)
 	}
 
-	return events, nil
+	return events, res.Err()
 }
