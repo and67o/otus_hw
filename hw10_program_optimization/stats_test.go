@@ -16,6 +16,8 @@ func TestGetDomainStat(t *testing.T) {
 {"Id":4,"Name":"Gregory Reid","Username":"tButler","Email":"5Moore@Teklist.net","Phone":"520-04-16","Password":"r639qLNu","Address":"Sunfield Park 20"}
 {"Id":5,"Name":"Janice Rose","Username":"KeithHart","Email":"nulla@Linktype.com","Phone":"146-91-01","Password":"acSBF5","Address":"Russell Trail 61"}`
 
+	incorrectData := `{"Id":67,"Name":"Oleg Test","Username":"test","Email":"test.mail","Phone":"123","Password":"123","Address":"123"}`
+
 	t.Run("find 'com'", func(t *testing.T) {
 		result, err := GetDomainStat(bytes.NewBufferString(data), "com")
 		require.NoError(t, err)
@@ -35,5 +37,31 @@ func TestGetDomainStat(t *testing.T) {
 		result, err := GetDomainStat(bytes.NewBufferString(data), "unknown")
 		require.NoError(t, err)
 		require.Equal(t, DomainStat{}, result)
+	})
+
+	t.Run("find empty", func(t *testing.T) {
+		emptyJson := "{}"
+		result, err := GetDomainStat(bytes.NewBufferString(emptyJson), "")
+		require.NoError(t, err)
+		require.Equal(t, DomainStat{}, result)
+	})
+
+
+	t.Run("not Parse", func(t *testing.T) {
+		json := "{1:}"
+		_, err := GetDomainStat(bytes.NewBufferString(json), "")
+		require.Error(t, err)
+	})
+
+	t.Run("not Parse", func(t *testing.T) {
+		json := "{1:}"
+		_, err := GetDomainStat(bytes.NewBufferString(json), "1")
+		require.Error(t, err)
+	})
+
+	t.Run("incorrect email", func(t *testing.T) {
+		result, err := GetDomainStat(bytes.NewBufferString(incorrectData), "mail")
+		require.Equal(t, DomainStat{}, result)
+		require.NoError(t, err)
 	})
 }
