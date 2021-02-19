@@ -9,12 +9,13 @@ type App struct { //nolint:maligned
 	Logger  interfaces.Logger
 	Storage interfaces.Storage
 
-	pb.UnimplementedCalendarServer
+	uCS pb.UnimplementedCalendarServer
 }
 
 func New(logger interfaces.Logger, storage interfaces.Storage) *App {
 	return &App{
 		Logger:  logger,
 		Storage: storage,
+		uCS: pb.UnimplementedCalendarServer{},
 	}
 }

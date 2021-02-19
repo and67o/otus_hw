@@ -5,6 +5,7 @@ package internalgrpc
 import (
 	"context"
 	"errors"
+	"fmt"
 	"net"
 	"strconv"
 
@@ -49,7 +50,7 @@ func (s *Server) Stop() error {
 func (s *Server) Start(ctx context.Context) error {
 	l, err := net.Listen(network, s.addr)
 	if err == nil {
-		return err
+		return fmt.Errorf("start server: %w", err)
 	}
 
 	serverGRPC := grpc.NewServer()
@@ -71,7 +72,7 @@ func (s *Server) Create(_ context.Context, request *pb.CreateRequest) (*pb.Creat
 
 	err := s.app.Storage.Create(event)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create: %w", err)
 	}
 
 	return &pb.CreateResponse{}, nil
@@ -82,7 +83,7 @@ func (s *Server) Delete(_ context.Context, request *pb.DeleteRequest) (*pb.Delet
 
 	err := s.app.Storage.Delete(id)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("delete: %w", err)
 	}
 
 	return &pb.DeleteResponse{}, nil
@@ -93,7 +94,7 @@ func (s *Server) Update(_ context.Context, request *pb.UpdateRequest) (*pb.Updat
 
 	err := s.app.Storage.Update(id, event)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update error: %w", err)
 	}
 
 	return &pb.UpdateResponse{}, nil
@@ -102,19 +103,19 @@ func (s *Server) Update(_ context.Context, request *pb.UpdateRequest) (*pb.Updat
 func (s *Server) DayEvents(_ context.Context, request *pb.DayEventsRequest) (*pb.DayEventsResponse, error) {
 	date, err := ptypes.Timestamp(request.Date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("timestamp error: %w", err)
 	}
 
 	events, err := s.app.Storage.DayEvents(date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("dayevents error: %w", err)
 	}
 
 	dayEvents := make([]*pb.Event, len(events))
 	for _, event := range events {
 		dayEvent, err := eventToGrpcEvent(event)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse event: %w", err)
 		}
 
 		dayEvents = append(dayEvents, dayEvent)
@@ -125,7 +126,7 @@ func (s *Server) DayEvents(_ context.Context, request *pb.DayEventsRequest) (*pb
 func (s *Server) WeekEvents(_ context.Context, request *pb.WeekEventsRequest) (*pb.WeekEventsResponse, error) {
 	date, err := ptypes.Timestamp(request.Date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("weekevents error: %w", err)
 	}
 
 	events, err := s.app.Storage.DayEvents(date)
