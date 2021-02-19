@@ -2,10 +2,10 @@ package memorystorage
 
 import (
 	"errors"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"sync"
 	"time"
 
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 )
 

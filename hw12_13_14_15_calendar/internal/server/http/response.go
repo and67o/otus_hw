@@ -25,7 +25,7 @@ func respondWithJSON(w http.ResponseWriter, code int, res Response) {
 	_, _ = w.Write(response)
 }
 
-func (r *Response) Json(w http.ResponseWriter, code int) {
+func (r *Response) JSON(w http.ResponseWriter, code int) {
 	response, _ := json.Marshal(r)
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)

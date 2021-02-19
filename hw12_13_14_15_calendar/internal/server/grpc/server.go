@@ -5,6 +5,9 @@ package internalgrpc
 import (
 	"context"
 	"errors"
+	"net"
+	"strconv"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
@@ -12,8 +15,6 @@ import (
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	"github.com/golang/protobuf/ptypes"
 	"google.golang.org/grpc"
-	"net"
-	"strconv"
 )
 
 const network = "tcp"

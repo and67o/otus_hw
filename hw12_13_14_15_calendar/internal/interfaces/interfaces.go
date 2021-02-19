@@ -2,9 +2,10 @@ package interfaces
 
 import (
 	"context"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	"net/http"
 	"time"
+
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 )
 
 type Storage interface {

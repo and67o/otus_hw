@@ -5,14 +5,15 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"net"
+	"net/http"
+	"time"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	"github.com/gorilla/mux"
-	"net"
-	"net/http"
-	"time"
 )
 
 type Server struct {
@@ -86,23 +87,21 @@ func (s *Server) Create(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&event)
 	if err != nil {
 		response.setError(err)
-		response.Json(w, http.StatusBadRequest)
+		response.JSON(w, http.StatusBadRequest)
 		return
 	}
 
 	err = s.app.Storage.Create(event)
 	if err != nil {
 		response.setError(err)
-		response.Json(w, http.StatusBadRequest)
+		response.JSON(w, http.StatusBadRequest)
 
 		respondWithJSON(w, http.StatusBadRequest, response)
 		return
 	}
 
 	response.setData(map[string]string{"message": "Ok"})
-	response.Json(w, http.StatusOK)
-
-	return
+	response.JSON(w, http.StatusOK)
 }
 
 func (s *Server) Update(w http.ResponseWriter, r *http.Request) {
@@ -127,7 +126,6 @@ func (s *Server) Update(w http.ResponseWriter, r *http.Request) {
 
 	response.setData(map[string]string{"message": "Ok"})
 	respondWithJSON(w, http.StatusBadRequest, response)
-	return
 }
 
 func (s *Server) Delete(w http.ResponseWriter, r *http.Request) {
@@ -144,7 +142,6 @@ func (s *Server) Delete(w http.ResponseWriter, r *http.Request) {
 
 	response.setData(map[string]string{"message": "Ok"})
 	respondWithJSON(w, http.StatusBadRequest, response)
-	return
 }
 
 func (s *Server) Events(w http.ResponseWriter, r *http.Request) {
@@ -155,7 +152,6 @@ func (s *Server) Events(w http.ResponseWriter, r *http.Request) {
 	date, err := time.Parse(time.RFC3339, params["date"])
 	if err != nil {
 		date = time.Now()
-
 	}
 
 	v := r.URL.Query()
@@ -179,5 +175,4 @@ func (s *Server) Events(w http.ResponseWriter, r *http.Request) {
 
 	response.setData(events)
 	respondWithJSON(w, http.StatusBadRequest, response)
-	return
 }
