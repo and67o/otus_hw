@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"flag"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
-	internalgrpc "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/grpc"
 	"log"
 	"os"
 	"os/signal"
@@ -13,7 +11,9 @@ import (
 
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/logger"
+	internalgrpc "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/grpc"
 	internalhttp "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/http"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/create"
 )
@@ -62,13 +62,13 @@ func main() {
 	err = httpServer.Start(ctx)
 	if err != nil {
 		logg.Error("failed to start http server: " + err.Error())
-		os.Exit(1) //nolint
+		os.Exit(1) //nolint:gocritic
 	}
 
 	err = grpcServer.Start(ctx)
 	if err != nil {
 		logg.Error("failed to start grpc server: " + err.Error())
-		os.Exit(1) //nolint
+		os.Exit(1) //nolint:gocritic
 	}
 }
 

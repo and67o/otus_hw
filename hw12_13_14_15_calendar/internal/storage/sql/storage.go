@@ -3,10 +3,10 @@ package sqlstorage
 import (
 	"database/sql"
 	"fmt"
-	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"time"
 
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 	_ "github.com/go-sql-driver/mysql" // nolint: gci
 	"github.com/jmoiron/sqlx"

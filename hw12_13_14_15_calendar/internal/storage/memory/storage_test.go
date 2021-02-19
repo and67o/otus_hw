@@ -30,7 +30,7 @@ func TestStorage(t *testing.T) {
 	require.Equal(t, "1", event.ID)
 
 	e.Title = "456"
-	err = storage.Update(e)
+	err = storage.Update("1", e)
 	require.Nil(t, err)
 
 	eventNotFoud := storage.Get("2")

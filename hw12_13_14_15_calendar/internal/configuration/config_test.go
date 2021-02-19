@@ -1,6 +1,7 @@
 package configuration
 
 import (
+	"errors"
 	"github.com/stretchr/testify/require"
 	"testing"
 )
@@ -14,7 +15,7 @@ func TestConfigurationErrors(t *testing.T) {
 	for _, tst := range [...]test{
 		{
 			path: "",
-			err:  errEmptyPath,
+			err:  errors.New("path empty"),
 		},
 	} {
 		_, err := New(tst.path)

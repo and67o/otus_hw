@@ -2,6 +2,7 @@ package create
 
 import (
 	"errors"
+
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	memorystorage "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/memory"

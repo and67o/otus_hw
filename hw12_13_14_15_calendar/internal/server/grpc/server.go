@@ -19,7 +19,7 @@ import (
 
 const network = "tcp"
 
-type Server struct {
+type Server struct { //nolint:maligned
 	addr   string
 	app    *app.App
 	server *grpc.Server
@@ -100,8 +100,6 @@ func (s *Server) Update(_ context.Context, request *pb.UpdateRequest) (*pb.Updat
 }
 
 func (s *Server) DayEvents(_ context.Context, request *pb.DayEventsRequest) (*pb.DayEventsResponse, error) {
-	var dayEvents []*pb.Event
-
 	date, err := ptypes.Timestamp(request.Date)
 	if err != nil {
 		return nil, err
@@ -112,6 +110,7 @@ func (s *Server) DayEvents(_ context.Context, request *pb.DayEventsRequest) (*pb
 		return nil, err
 	}
 
+	dayEvents := make([]*pb.Event, len(events))
 	for _, event := range events {
 		dayEvent, err := eventToGrpcEvent(event)
 		if err != nil {
@@ -124,8 +123,6 @@ func (s *Server) DayEvents(_ context.Context, request *pb.DayEventsRequest) (*pb
 	return &pb.DayEventsResponse{Events: dayEvents}, nil
 }
 func (s *Server) WeekEvents(_ context.Context, request *pb.WeekEventsRequest) (*pb.WeekEventsResponse, error) {
-	var weekEvents []*pb.Event
-
 	date, err := ptypes.Timestamp(request.Date)
 	if err != nil {
 		return nil, err
@@ -136,6 +133,7 @@ func (s *Server) WeekEvents(_ context.Context, request *pb.WeekEventsRequest) (*
 		return nil, err
 	}
 
+	weekEvents := make([]*pb.Event, len(events))
 	for _, event := range events {
 		weekEvent, err := eventToGrpcEvent(event)
 		if err != nil {
@@ -148,8 +146,6 @@ func (s *Server) WeekEvents(_ context.Context, request *pb.WeekEventsRequest) (*
 	return &pb.WeekEventsResponse{Events: weekEvents}, nil
 }
 func (s *Server) MonthEvents(_ context.Context, request *pb.MonthEventsRequest) (*pb.MonthEventsResponse, error) {
-	var monthEvents []*pb.Event
-
 	date, err := ptypes.Timestamp(request.Date)
 	if err != nil {
 		return nil, err
@@ -160,6 +156,7 @@ func (s *Server) MonthEvents(_ context.Context, request *pb.MonthEventsRequest) 
 		return nil, err
 	}
 
+	monthEvents := make([]*pb.Event, len(events))
 	for _, event := range events {
 		monthEvent, err := eventToGrpcEvent(event)
 		if err != nil {

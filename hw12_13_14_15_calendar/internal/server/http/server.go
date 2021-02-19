@@ -96,7 +96,6 @@ func (s *Server) Create(w http.ResponseWriter, r *http.Request) {
 		response.setError(err)
 		response.JSON(w, http.StatusBadRequest)
 
-		respondWithJSON(w, http.StatusBadRequest, response)
 		return
 	}
 
@@ -113,19 +112,19 @@ func (s *Server) Update(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&event)
 	if err != nil {
 		response.setError(err)
-		respondWithJSON(w, http.StatusBadRequest, response)
+		response.JSON(w, http.StatusBadRequest)
 		return
 	}
 
 	err = s.app.Storage.Update(params["id"], event)
 	if err != nil {
 		response.setError(err)
-		respondWithJSON(w, http.StatusBadRequest, response)
+		response.JSON(w, http.StatusBadRequest)
 		return
 	}
 
 	response.setData(map[string]string{"message": "Ok"})
-	respondWithJSON(w, http.StatusBadRequest, response)
+	response.JSON(w, http.StatusOK)
 }
 
 func (s *Server) Delete(w http.ResponseWriter, r *http.Request) {
@@ -141,7 +140,7 @@ func (s *Server) Delete(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.setData(map[string]string{"message": "Ok"})
-	respondWithJSON(w, http.StatusBadRequest, response)
+	response.JSON(w, http.StatusOK)
 }
 
 func (s *Server) Events(w http.ResponseWriter, r *http.Request) {
@@ -169,10 +168,10 @@ func (s *Server) Events(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		response.setError(err)
-		respondWithJSON(w, http.StatusBadRequest, response)
+		response.JSON(w, http.StatusBadRequest)
 		return
 	}
 
 	response.setData(events)
-	respondWithJSON(w, http.StatusBadRequest, response)
+	response.JSON(w, http.StatusOK)
 }
