@@ -39,3 +39,4 @@ type HTTPApp interface {
 	Delete(w http.ResponseWriter, r *http.Request)
 	Events(w http.ResponseWriter, r *http.Request)
 }
+
