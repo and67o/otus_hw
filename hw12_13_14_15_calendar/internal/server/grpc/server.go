@@ -131,7 +131,7 @@ func (s *Server) WeekEvents(_ context.Context, request *pb.WeekEventsRequest) (*
 
 	events, err := s.app.Storage.DayEvents(date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("weekevents error: %w", err)
 	}
 
 	weekEvents := make([]*pb.Event, len(events))
@@ -149,19 +149,19 @@ func (s *Server) WeekEvents(_ context.Context, request *pb.WeekEventsRequest) (*
 func (s *Server) MonthEvents(_ context.Context, request *pb.MonthEventsRequest) (*pb.MonthEventsResponse, error) {
 	date, err := ptypes.Timestamp(request.Date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("timestamp error: %w", err)
 	}
 
 	events, err := s.app.Storage.DayEvents(date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("dayevents error: %w", err)
 	}
 
 	monthEvents := make([]*pb.Event, len(events))
 	for _, event := range events {
 		monthEvent, err := eventToGrpcEvent(event)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("parse event: %w", err)
 		}
 
 		monthEvents = append(monthEvents, monthEvent)
@@ -185,7 +185,7 @@ func grpcEventToEvent(e *pb.Event) storage.Event {
 func eventToGrpcEvent(e storage.Event) (*pb.Event, error) {
 	date, err := ptypes.TimestampProto(e.Date)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("timestamp error: %w", err)
 	}
 
 	return &pb.Event{
