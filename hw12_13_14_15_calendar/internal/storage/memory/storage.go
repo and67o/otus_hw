@@ -5,6 +5,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage"
 )
 
@@ -18,13 +19,16 @@ var (
 	errNotFound = errors.New("not found")
 )
 
-func New() *Storage {
+func New() interfaces.Storage {
 	return &Storage{
 		events: make(map[string]*storage.Event),
 	}
 }
 
 func (s *Storage) Get(id string) *storage.Event {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
 	_, ok := s.events[id]
 	if !ok {
 		return nil
@@ -47,15 +51,15 @@ func (s *Storage) Create(e storage.Event) error {
 	return nil
 }
 
-func (s *Storage) Update(e storage.Event) error {
+func (s *Storage) Update(id string, e storage.Event) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if s.events[e.ID] == nil {
+	if s.events[id] == nil {
 		return errNotFound
 	}
 
-	s.events[e.ID] = &e
+	s.events[id] = &e
 
 	return nil
 }

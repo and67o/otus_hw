@@ -87,7 +87,7 @@ func TestStorage(t *testing.T) {
 		exampleEvent.Duration = 128
 		exampleEvent.OwnerID = "567"
 
-		err = db.Update(exampleEvent)
+		err = db.Update(id, exampleEvent)
 		require.Nil(t, err)
 
 		err = db.Delete(id)

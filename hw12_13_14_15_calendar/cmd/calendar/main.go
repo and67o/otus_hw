@@ -6,11 +6,14 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/app"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/configuration"
+	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/interfaces"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/logger"
+	internalgrpc "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/grpc"
 	internalhttp "github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/server/http"
 	"github.com/and67o/otus_hw/hw12_13_14_15_calendar/internal/storage/create"
 )
@@ -46,25 +49,32 @@ func main() {
 
 	calendar := app.New(logg, storage)
 
-	server := internalhttp.NewServer(calendar, config.Server)
+	httpServer := internalhttp.New(calendar, config.Rest)
+	grpcServer := internalgrpc.New(calendar, config.GRPC)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	go watchSignals(server, logg, cancel)
+	go watchSignals(httpServer, grpcServer, logg, cancel)
 
-	logg.Info("calendar is running...")
+	logg.Info("calendar start")
 
-	err = server.Start(ctx)
+	err = httpServer.Start(ctx)
 	if err != nil {
 		logg.Error("failed to start http server: " + err.Error())
-		os.Exit(1) //nolint
+		os.Exit(1) //nolint:gocritic
+	}
+
+	err = grpcServer.Start(ctx)
+	if err != nil {
+		logg.Error("failed to start grpc server: " + err.Error())
+		os.Exit(1) //nolint:gocritic
 	}
 }
 
-func watchSignals(server *internalhttp.Server, logg *logger.Logger, cancel context.CancelFunc) {
+func watchSignals(httpServer interfaces.HTTPApp, grpcServer interfaces.GRPC, logg interfaces.Logger, cancel context.CancelFunc) {
 	signals := make(chan os.Signal, 1)
-	signal.Notify(signals)
+	signal.Notify(signals, os.Interrupt, syscall.SIGTERM)
 
 	<-signals
 	signal.Stop(signals)
@@ -73,7 +83,13 @@ func watchSignals(server *internalhttp.Server, logg *logger.Logger, cancel conte
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second*3)
 	defer cancel()
 
-	if err := server.Stop(ctx); err != nil {
+	err := httpServer.Stop(ctx)
+	if err != nil {
 		logg.Error("failed to stop http server: " + err.Error())
+	}
+
+	err = grpcServer.Stop()
+	if err != nil {
+		logg.Error("failed to stop grpc server: " + err.Error())
 	}
 }
