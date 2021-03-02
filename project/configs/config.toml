@@ -1,0 +1,29 @@
+[db]
+db_user = "admin"
+db_password = "123"
+db_database = "go_api"
+db_host = "127.0.0.1"
+db_port = 3306
+
+[logger]
+log_level = "INFO"
+log_file = "./logs/log.log"
+log_trace_on = false
+log_prod_on = false
+
+[server]
+server_host = "127.0.0.1"
+server_port = 50051
+
+[rabbit]
+rabbit_user = "guest"
+rabbit_password = "guest"
+rabbit_host = "127.0.0.1"
+rabbit_port = 5672
+rabbit_durable = true
+rabbit_autodelete = false
+rabbit_no_wait = false
+rabbit_internal = false
+rabbit_name = "banner_exchange_queue"
+rabbit_kind = "direct"
+rabbit_key = "banner"
